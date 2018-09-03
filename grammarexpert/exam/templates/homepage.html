@@ -23,7 +23,7 @@
               <hr>
             </div>
             {% if user.is_authenticated %}
-            {% if perms.grammarapp.create_test %}
+            {% if perms.exam.create_test %}
             <div class="col-lg-8 mx-auto">
                 <p class="text-faded mb-5">Create new questions or see attempts made for your questions. You can also see overall user performance for all questions thay have attempted from your question bank.</p>
                 <a href="{% url "questionmanager" %}"><button class="btn btn-primary mt-5 btn-xl">Manage Questions</button></a>
@@ -56,7 +56,7 @@
 
 {% include "footer.html" %}
 
-{% if user.is_authenticated and not perms.grammarapp.create_test %}
+{% if user.is_authenticated and not perms.exam.create_test %}
 <script>
     function getCookie(name) {
         var cookieValue = null;

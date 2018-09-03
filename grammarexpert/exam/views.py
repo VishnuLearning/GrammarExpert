@@ -200,7 +200,10 @@ def get_results(request):
     if request.method == "POST":
         id = request.POST['id']
         qs =  Answer.objects.get(pk=id)
-        return HttpResponse(qs.Json)
+        if request.user == qs.user or request.user.has_perm('exam.create_user'):
+            return HttpResponse(qs.Json)
+        else:
+            return JsonResponse([])
     else:
         return JsonResponse([])
 
