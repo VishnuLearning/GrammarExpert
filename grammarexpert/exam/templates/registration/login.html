@@ -1,0 +1,31 @@
+
+{% load bootstrap4 %}
+{% load static %}
+{% include "header.html" %}
+
+    <div class="container masthead text-center">
+        <div class="row-1">
+            <div class="d-flex flex-column col-sm-9 col-md-7 col-lg-5 mx-auto my-5">
+                <div class="card card-login p-2">
+                    <div class="card-body">
+                        <form method="post">
+                            {% csrf_token %}
+                            {% bootstrap_form form %}
+                            <input type="submit" name="commit" value="Login" tabindex="3" class="btn btn-primary btn-block" data-disable-with="Logging in…">
+                        </form>
+                    </div>
+                </div>
+                <div class="card card-create-user mt-3">
+                    <div class="card-body text-center">
+                        New to Grammar Expert?
+                        <a href="{% url "signup" %}" class="card-link">Create account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% include "footer.html" %}
+</body>
+</html>
+
+

@@ -1,0 +1,113 @@
+{% load static %}
+{% include "header.html" %}
+<style>
+    header.masthead {
+        background-image: url("{% static "images/bg.jpg"%}");
+        padding-top: 10rem;
+        padding-bottom: calc(10rem - 56px);
+        background-position: center center;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+    }
+</style>
+
+<header class="masthead text-center text-white d-flex">
+        <div class="container my-auto">
+          <div class="row">
+            <div class="col-lg-10 mx-auto">
+              <h1 class="text-uppercase">
+                <strong>Put your grammar skills to test</strong>
+              </h1>
+              <hr>
+            </div>
+            {% if user.is_authenticated %}
+            {% if perms.grammarapp.create_test %}
+            <div class="col-lg-8 mx-auto">
+                <p class="text-faded mb-5">Create new questions or see attempts made for your questions. You can also see overall user performance for all questions thay have attempted from your question bank.</p>
+                <a href="{% url "questionmanager" %}"><button class="btn btn-primary mt-5 btn-xl">Manage Questions</button></a>
+                <a href="{% url "analytics" %}"><button class="btn btn-success mt-5 btn-xl">User Summary</button></a>
+            </div>
+            {% else %}
+            <div class="col-lg-8 mx-auto">
+                <p class="text-faded mb-5">Take a test if you know the test code or practice on some great essay topics. At any point you can see your performance and improve.</p>
+                <div class="input-group text-center" style="width:310px; margin: 0 auto;">
+                <input type="text" id="code" class="form-control" placeholder="Enter question code">
+                <span class="input-group-btn" >
+                    <button id="go" class="btn btn-success" style="border-radius:0 5px 5px 0; height:50px;" type="button" onclick="verifyandgo();">Go</button>
+                </span>
+                </div>
+                <a href="{% url "practice" %}"><button class="btn btn-primary mt-5 btn-xl">Practice</button></a>
+                <a href="{% url "getuserperformance" %}"><button class="btn btn-success mt-5 btn-xl">Your Stats</button></a>
+            </div>
+            
+            {% endif %}
+            {% else %}
+            <div class="col-lg-8 mx-auto">
+                    <p class="text-faded mb-5">Use one of the optione below to access</p>
+                    <a href="{% url "login" %}"><button class="btn btn-primary mt-5 btn-xl">Login</button></a>
+                    <a href="{% url "signup" %}"><button class="btn btn-success mt-5 btn-xl">Signup</button></a>
+                </div>
+            {% endif %}
+          </div>
+        </div>
+      </header>
+
+{% include "footer.html" %}
+
+{% if user.is_authenticated and not perms.grammarapp.create_test %}
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+                // Only send the token to relative URLs i.e. locally.
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        }
+    });
+
+    $(function() {
+        $('#go').prop("disabled", true);
+        $('#code').keyup(function() {
+            var code = $('#code').val();
+            if (code.trim()=='' || code.length!=8) {
+                $('#go').prop("disabled", true);
+            } else {
+                $('#go').prop("disabled", false);
+            }
+        })
+    })
+    var verifyandgo = function() {
+        var code = $('#code').val();
+        //make ajax call and on response success relocate to the attempt page else alert error
+        $.getJSON("/canattempt/"+code, function(data) {
+            console.log(data)
+            if(data['status']=='OK') {
+                window.location.href = data["url"];
+            } else {
+                alert(data['status']);
+            }
+        })
+    }
+</script>
+{% endif %}
+</body>
+</html>
+

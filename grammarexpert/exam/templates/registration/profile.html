@@ -1,0 +1,23 @@
+ {% load bootstrap4 %}
+ {% load static %}
+ {% include "header.html" %}
+<div class="container masthead text-center" style="margin-top:30px">
+    <div class="row-1">
+        <div class="card">
+            <div class="card-header">
+                {{user}}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{profile.name}}</h5>
+                <p class="card-text">{{user.email}}</p>
+                <p class="card-text">{{profile.college}}</p>
+                <p class="card-text">{{profile.college_id}}</p>
+                <p class="card-text">{{profile.branch_of_study}}</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% include "footer.html" %}
+</body>
+
+</html>
