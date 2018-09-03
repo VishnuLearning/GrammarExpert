@@ -73,7 +73,7 @@ var highlightErrors = function (data) {
     var offset = errors[0].offset;
     var length;
     var e = $('#essay');
-
+    e.empty();
     if (offset > 0) {
         appendElem(e, showText(text.substring(0, offset)));
     }

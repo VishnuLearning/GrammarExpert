@@ -14,6 +14,16 @@ hr {
   border-color: #F05F40;
 }
 
+.footer {
+  background-color: #343a40;
+  text-align: center;
+}
+
+.footer .logo {
+  margin:20px auto;
+  width:300px;
+}
+
 hr.light {
   border-color: #fff;
 }

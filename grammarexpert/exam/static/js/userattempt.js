@@ -86,8 +86,4 @@ $(function() {
         }
         result.innerHTML = f;
     }, false);
-
-    $( window ).unload(function() {
-        return 'Think before you leave! You will lose all your content and you will have to re-write again.';
-    });
 })
