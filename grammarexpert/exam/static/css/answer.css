@@ -22,11 +22,6 @@ body{
 #homelink:hover {
     text-decoration: none;
 }
-.navbar-brand span{
-    padding-left: 15px;
-    font-family: 'Raleway', sans-serif;
-    letter-spacing: 0.0800em;
-}
 
 .row {
     margin-top:50px;
