@@ -52,6 +52,21 @@ def update_profile(request):
         'profile': request.user.profile
     })
 
+class EmailThread(threading.Thread):
+    def __init__(self, subject, html_content, recipient):
+        self.subject = subject
+        self.recipient_list = recipient
+        self.html_content = html_content
+        threading.Thread.__init__(self)
+
+    def run (self):
+        msg = EmailMessage(self.subject, self.html_content, to=[self.recipient])
+        msg.content_subtype = "html"
+        msg.send()
+
+def send_html_mail(subject, html_content, recipient_list):
+    EmailThread(subject, html_content, recipient_list).start()
+
 def signup(request):
     c = Profile.objects.order_by().values_list('college').distinct()
     colleges = [col[0] for col in c if col[0]]
@@ -74,7 +89,7 @@ def signup(request):
             
             
             current_site = get_current_site(request)
-            mail_subject = 'Activate your grammar check account.'
+            mail_subject = 'Activate your grammar expert account.'
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             tok = account_activation_token.make_token(user)          
             message = render_to_string('registration/acc_active_email.html', {
@@ -84,10 +99,12 @@ def signup(request):
                 'token':tok,
             })
             to_email = user_form.cleaned_data.get('email')
-            email = EmailMessage(
-                        mail_subject, message, to=[to_email]
-            )
-            email.send()
+
+            send_html_mail(mail_subject, message, to_email)
+            # email = EmailMessage(
+            #             mail_subject, message, to=[to_email]
+            # )
+            # email.send()
             return render(request, 'registration/message.html', {'message':'Please confirm your email address to complete the registration'})
     else:
         user_form = UserForm()
