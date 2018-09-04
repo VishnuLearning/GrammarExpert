@@ -23,6 +23,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import login, authenticate
 import random
 import string
+import threading
 
 datetimeformat = "%Y %d %m %H:%M"
 
@@ -55,17 +56,20 @@ def update_profile(request):
 class EmailThread(threading.Thread):
     def __init__(self, subject, html_content, recipient):
         self.subject = subject
-        self.recipient_list = recipient
+        self.recipient = recipient
         self.html_content = html_content
         threading.Thread.__init__(self)
 
     def run (self):
         msg = EmailMessage(self.subject, self.html_content, to=[self.recipient])
         msg.content_subtype = "html"
-        msg.send()
+        try:
+            msg.send()
+        except e:
+            print(e)
 
-def send_html_mail(subject, html_content, recipient_list):
-    EmailThread(subject, html_content, recipient_list).start()
+def send_html_mail(subject, html_content, recipient):
+    EmailThread(subject, html_content, recipient).start()
 
 def signup(request):
     c = Profile.objects.order_by().values_list('college').distinct()
