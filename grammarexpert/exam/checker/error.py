@@ -6,7 +6,7 @@ class Error:
         self.title = m['shortMessage']
         self.offset = m['offset']
         self.length = m['length']
-        self.suggestions = [suggestion["value"] for suggestion in m['replacements']]
+        self.suggestions = [suggestion["value"] for suggestion in m['replacements']][:5]
         self.rule = Rule(m['rule'])
     
     def errorType(self):

@@ -9,7 +9,7 @@
 <p id="myqid" class="hidden" >{{question.id}}</p>
 <p id="starttime" class="hidden">{{starttime}}</p>
 
-<div class="container">
+<div class="container masthead" style="padding:30px 0;">
     <div class="row">
             <h3 class="col-sm-8 col-md-8">{{ question.question }}</h3>
             <h4 class="col-sm-3 col-md-3" id="time">{{question.time_limit}}</h4>
@@ -29,10 +29,15 @@
     
     {% include "examuser/markedscript.html" %}
 </div>
-<div style="height:30px;"></div>
 {% include "footer.html" %}
 <script src="{% static "js/displayresults.js" %}"></script>
 <script src="{% static "js/userattempt.js" %}"></script>
-
+<script>
+    $(function() {
+        $('input,textarea').bind('cut copy paste', function (e) {
+            e.preventDefault(); //disable cut,copy,paste
+        });
+    })
+</script>
 </body>
 </html>
