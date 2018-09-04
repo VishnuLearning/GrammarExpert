@@ -244,9 +244,9 @@ img::-moz-selection {
 }
 
 .navbar-brand span{
-    padding-left: 15px;
+    padding-left: 10px;
     /* font-family: 'Raleway', sans-serif; */
-    letter-spacing: 0.0800em;
+    /*letter-spacing: 0.0800em;*/
 }
 #homelink {
     text-decoration: none;
@@ -257,4 +257,14 @@ img::-moz-selection {
 
 #homelink:hover {
     text-decoration: none;
+}
+
+@media (max-width:400px) {
+  .navbar-brand span {
+       font-size:0.8em;
+  }
+
+  #mainNav .navbar-brand {
+    font-weight: 200;
+  }
 }
