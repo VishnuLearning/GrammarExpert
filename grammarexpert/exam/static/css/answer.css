@@ -2,10 +2,10 @@
     display:block;
     height:50px;
     line-height: 50px;
-    border-radius:15px;
+    border-radius:5px;
     margin:0 10px;
    color: white;
-   background-color: cornflowerblue;
+   background-color: #555555;
 }
 body{
     font-family: 'Ubuntu', sans-serif;
@@ -30,10 +30,6 @@ body{
 
 .row {
     margin-top:50px;
-}
-
-#time {
-    text-align: center;
 }
 
 .modal-lg {
@@ -111,3 +107,14 @@ span.correct {
       height:100%;
       background-color: rgba(0,0,0,0.8);
   }
+
+  @media (max-width:400px) {
+    #time, #submit_button {
+       width:70%;
+       margin: 0 auto;
+    }
+    #id_answer {
+       width:90%;
+       margin: 0 auto;
+    }
+ }
