@@ -50,7 +50,7 @@ span.error {
     text-decoration: underline;
 }
 
-span.spelling {
+span.spelling, pre.spelling {
     color:white;
     font-weight: bold;
     background-color: darkred;
