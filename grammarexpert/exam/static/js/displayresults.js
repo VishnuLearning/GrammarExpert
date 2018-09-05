@@ -59,8 +59,8 @@ var highlightErrors = function (data) {
     var round = function(v) {
         return Math.round(v * 100)/100
     };
-    text = data["answer"];
-    errors = data["errors"];
+    var text = data["answer"];
+    var errors = data["errors"];
     $('#w_c').text(data['wordCount']);
     $('#grammar').text(data['grammarErrorCount']);
     $('#spelling').text(data['spellingErrorCount']);

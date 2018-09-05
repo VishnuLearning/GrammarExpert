@@ -7,3 +7,6 @@ admin.site.register(Answer)
 
 class Question(admin.ModelAdmin):
     list_display = ["question"]
+
+class Answer(admin.ModelAdmin):
+    list_display = ["user", "question", "score"]
