@@ -9,7 +9,10 @@ class Report:
 
     def __init__(self, essay, word_limit):
         global languagecheckurl
-        self.essay = essay
+
+        self.essay = re.sub(' +',' ',essay)
+
+        # replace all continuous spaces with single space
 
         payload = {"text":essay,"language":"en-US", "enabledOnly":"false"}
         response = requests.post(languagecheckurl,data = payload)
