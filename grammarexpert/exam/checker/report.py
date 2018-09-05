@@ -49,10 +49,13 @@ class Report:
             self.sentencequalitypenalty = ((desired_words_per_sentence-self.avg_words_per_sentences)/desired_words_per_sentence)*4
 
         desired_word_length = 8
+        min_avg_word_len = 4
         self.wordqualitypenalty = 0
+        if self.avg_word_length_without_stopwords < min_avg_word_len:
+            self.wordqualitypenalty = 2
         #penality regarding avg_word_length without_stop_words
-        if self.avg_word_length_without_stopwords<desired_word_length:
-            self.wordqualitypenalty = ((desired_word_length-self.avg_word_length_without_stopwords)/desired_word_length)*2
+        elif self.avg_word_length_without_stopwords<desired_word_length:
+            self.wordqualitypenalty = ((desired_word_length-self.avg_word_length_without_stopwords)/desired_word_length)*4
 
         
         #spellingmistakes and grammar mistakes
