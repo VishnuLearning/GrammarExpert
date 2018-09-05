@@ -14,10 +14,10 @@ class Report:
 
         # replace all continuous spaces with single space
 
-        payload = {"text":essay,"language":"en-US", "enabledOnly":"false"}
+        payload = {"text":self.essay,"language":"en-US", "enabledOnly":"false"}
         response = requests.post(languagecheckurl,data = payload)
         self.errors = [Error(m) for m in response.json()['matches']]
-        self.words = re.sub(r"[.,?!;():\"\']", " ", essay).split()
+        self.words = re.sub(r"[.,?!;():\"\']", " ", self.essay).split()
         self.wordCount = len(self.words)
         self.score = 10
 
@@ -30,7 +30,7 @@ class Report:
             self.wordlimitpenalty = 3*2*(x)/word_limit
         
         #average_words_per_sentences
-        sentencesList = essay.split('.')
+        sentencesList = self.essay.split('.')
         self.avg_words_per_sentences = self.wordCount / len(sentencesList)
 
         #words_without_stop_words
@@ -71,9 +71,6 @@ class Report:
         self.wordlimitpenalty = round(self.wordlimitpenalty, 2)
         self.wordqualitypenalty = round(self.wordqualitypenalty, 2)
         self.sentencequalitypenalty = round(self.sentencequalitypenalty, 2)
-
-        #replace with original answer
-        self.essay = essay
 
     def reprJSON(self):
         return dict(answer=self.essay, score = self.score,errors = [e.reprJSON() for e in self.errors],
