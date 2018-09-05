@@ -37,12 +37,15 @@ class Report:
         self.avg_word_length_without_stopwords = sum(map(len, words_without_stop_words))/len(words_without_stop_words)
  
         desired_words_per_sentence = 20
+        min_words_per_sentence = 10
         self.sentencequalitypenalty=0
         #penality regarding avg_words_per_sentences
-        if self.avg_words_per_sentences <=desired_words_per_sentence:
-            self.sentencequalitypenalty = ((desired_words_per_sentence-self.avg_words_per_sentences)/desired_words_per_sentence)*2
+        if self.avg_words_per_sentences < min_words_per_sentence:
+            self.sentencequalitypenalty = 2
+        elif self.avg_words_per_sentences <=desired_words_per_sentence:
+            self.sentencequalitypenalty = ((desired_words_per_sentence-self.avg_words_per_sentences)/desired_words_per_sentence)*4
 
-        desired_word_length = 6
+        desired_word_length = 8
         self.wordqualitypenalty = 0
         #penality regarding avg_word_length without_stop_words
         if self.avg_word_length_without_stopwords<desired_word_length:
