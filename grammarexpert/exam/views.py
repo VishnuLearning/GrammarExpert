@@ -239,8 +239,8 @@ def fetch_results(request):
         qid = request.POST['qid']
         q = Question.objects.get(pk=qid)
 
-        if not can_attempt_question(request.user.id, q.qid):
-            return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
+        if not can_attempt_question(request.user.id, qid):
+           return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
 
         starttime = datetime.strptime(request.POST['starttime'], datetimeformat)
         endtime = datetime.now()
