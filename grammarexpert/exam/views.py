@@ -235,7 +235,7 @@ def fetch_results(request):
         qid = request.POST['qid']
         q = Question.objects.get(pk=qid)
 
-        if not canattempt(request, a.code):
+        if not canattempt(request, q.code):
             return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
 
         starttime = datetime.strptime(request.POST['starttime'], datetimeformat)
