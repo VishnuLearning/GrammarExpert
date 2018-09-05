@@ -234,6 +234,10 @@ def fetch_results(request):
         essay = request.POST['essay']
         qid = request.POST['qid']
         q = Question.objects.get(pk=qid)
+
+        if not canattempt(request, a.code):
+            return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
+
         starttime = datetime.strptime(request.POST['starttime'], datetimeformat)
         endtime = datetime.now()
         d = Report(essay, q.word_limit).reprJSON()
@@ -360,10 +364,14 @@ def getallusersummary(request):
         minscore = request.POST["minscore"]
         maxscore = request.POST["maxscore"]
 
+    #TODO: improve query performance
     qs = Answer.objects.filter(question__user_id=request.user.id, score__gte = minscore, score__lte = maxscore).select_related().values("user_id").annotate(Avg('score'), Count('question'), Max('starttime'))
     results = []
     for result in qs:
         u = User.objects.get(pk=result['user_id'])
         results.append({"userid":result['user_id'], "username":u.username, "profile":u.profile, "avgscore":round(result['score__avg'],2), "count":result['question__count'], "lastattempted":result['starttime__max']})
+    
+    results.sort(key=lambda x: -x["avgscore"])
+
     attrs = {"minscore":minscore, "maxscore":maxscore}
     return render(request, template_name="examcreator/getallusersummary.html", context={"results":results, "attrs":attrs})
