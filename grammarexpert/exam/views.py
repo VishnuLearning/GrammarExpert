@@ -206,6 +206,10 @@ def attempt(request,code):
     else:
         return redirect('homepage')
 
+def can_attempt_question(userid, qid):
+    q = Question.objects.get(pk=qid)
+    a = list(Answer.objects.filter(user_id=userid,question_id=qid))
+    return len(a) < q.attempts_allowed:
 
 @login_required(login_url="login")
 def canattempt(request, code):
@@ -235,7 +239,7 @@ def fetch_results(request):
         qid = request.POST['qid']
         q = Question.objects.get(pk=qid)
 
-        if not canattempt(request, q.code):
+        if not can_attempt_question(request.user.id, q.qid):
             return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
 
         starttime = datetime.strptime(request.POST['starttime'], datetimeformat)
