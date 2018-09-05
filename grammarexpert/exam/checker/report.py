@@ -69,6 +69,9 @@ class Report:
         self.wordqualitypenalty = round(self.wordqualitypenalty, 2)
         self.sentencequalitypenalty = round(self.sentencequalitypenalty, 2)
 
+        #replace with original answer
+        self.essay = essay
+
     def reprJSON(self):
         return dict(answer=self.essay, score = self.score,errors = [e.reprJSON() for e in self.errors],
         wordCount = self.wordCount, spellingErrorCount = self.spellingErrorCount, wordlimitpenalty=self.wordlimitpenalty,
