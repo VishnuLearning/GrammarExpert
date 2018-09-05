@@ -209,7 +209,7 @@ def attempt(request,code):
 def can_attempt_question(userid, qid):
     q = Question.objects.get(pk=qid)
     a = list(Answer.objects.filter(user_id=userid,question_id=qid))
-    return len(a) < q.attempts_allowed:
+    return len(a) < q.attempts_allowed
 
 @login_required(login_url="login")
 def canattempt(request, code):
