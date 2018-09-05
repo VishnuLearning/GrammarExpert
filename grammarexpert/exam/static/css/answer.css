@@ -56,7 +56,7 @@ span.spelling {
     background-color: darkred;
 }
 
-span.grammar {
+span.grammar, pre.grammar {
     font-weight: bold;
     font-style: italic;
     background-color: yellow;
