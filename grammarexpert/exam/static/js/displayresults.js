@@ -68,12 +68,15 @@ var highlightErrors = function (data) {
     $('#score').text(round(data['score']));
     $('#sentencequality').text(round(data['sentencequalitypenalty']));
     $('#wordquality').text(round(data['wordqualitypenalty']));
-    if (errors.length == 0) return;
+    var e = $('#essay');
+    e.empty();
+    if (errors.length == 0) {
+        $('#essay').text(text);
+    } else {
 
     var offset = errors[0].offset;
     var length;
-    var e = $('#essay');
-    e.empty();
+    
     if (offset > 0) {
         appendElem(e, showText(text.substring(0, offset)));
     }
@@ -92,7 +95,7 @@ var highlightErrors = function (data) {
             appendElem(e, showText(text.substring(offset + length, errors[i + 1].offset)));
         }
     }
-
+    }
     $('#essay').show();
     $('#res').show();
 }
