@@ -16,6 +16,7 @@ urlpatterns = [
     path('practice/',views.practice,name='practice'),
     path('fetch/',views.fetch_results,name='fetch_results'),
     path('getresult/',views.get_results,name='get_results'),
+    path('updatecomment/',views.update_comment,name='update_comment'),
     path('getuserperformance/',views.getuserperformance,name='getuserperformance'),
     path('leaderboard/<int:qid>',views.leaderboard, name = 'leaderboard'),
     path('getuserattemptdata/', views.getuserattemptdata, name='getuserattemptdata'),

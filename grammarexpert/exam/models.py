@@ -62,3 +62,4 @@ class Answer(models.Model):
     grammarErrors = models.IntegerField()
     starttime = models.DateTimeField()
     endtime = models.DateTimeField()
+    comments = models.CharField(max_length=255, default="")

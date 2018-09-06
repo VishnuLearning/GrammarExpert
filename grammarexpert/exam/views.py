@@ -24,9 +24,11 @@ from django.contrib.auth import login, authenticate
 import random
 import string
 import threading
+import pytz
+from django.utils import timezone
 
 datetimeformat = "%Y %d %m %H:%M"
-
+tz = pytz.timezone('Asia/Kolkata') #TODO: set to users timezone somehow
 
 @login_required(login_url="login")
 #@transaction.atomic
@@ -295,18 +297,45 @@ def delete_question(request, qid):
         question.delete()
         return redirect('questionmanager')
 
+def getFormattedDuration(timeinsec):
+    timeinsec = int(timeinsec)
+    m = timeinsec//60
+    s = timeinsec - m*60
+    return "{0}m {1}s".format(m, s)
+
+@login_required(login_url="login")
+@permission_required('exam.create_test')
+def update_comment(request):
+    if request.POST:
+        comment = request.POST["comment"]
+        aid = request.POST["id"]
+        a = Answer.objects.get(pk=aid)
+        if a:
+            # only the person who created the question can give comments for its answers
+            q = Question.objects.get(pk=a.question_id)
+            if q.user == request.user:
+                a.comments = comment
+                a.save()
+                return JsonResponse({"status":"OK"})
+            else:
+                return JsonResponse({"status":"Permission Denied"})
+        
+    return JsonResponse({"status":"invalid data"})
+    
+
 @login_required(login_url="login")
 @permission_required('exam.create_test')
 def leaderboard(request, qid):
-    qs = Answer.objects.filter(question_id=qid).order_by('-score').only("id", "user", "score", "starttime", "endtime")
-    q = Question.objects.get(pk=qid).question
+    qs = Answer.objects.filter(question_id=qid).order_by('-score').only("id", "user", "score", "starttime", "endtime", "comments")
+    q = Question.objects.get(pk=qid)
     results = []
     if qs:
         rank = 1
         for attempt in qs:
-            results.append((attempt.user, rank, round(attempt.score,2), datetime.strftime(attempt.starttime, "%d-%m-%Y"), datetime.strftime(attempt.starttime, "%H:%M"), datetime.strftime(attempt.endtime, "%H:%M"), attempt.id))
+            t = getFormattedDuration((attempt.endtime - attempt.starttime).total_seconds())
+            results.append((attempt.user, rank, round(attempt.score,2), datetime.strftime(attempt.endtime.astimezone(tz), "%d-%m-%Y %H:%M ("+t+")"), attempt.id, attempt.comments))
             rank += 1
-    return render(request, template_name="examcreator/leaderboard.html", context={"results": results, "question":q})
+    return render(request, template_name="examcreator/leaderboard.html", context={"results": results, "question":q.question, "questionsetter":q.user==request.user})
 
 @login_required(login_url="login")
 def getuserattemptdata(request):
@@ -326,20 +355,23 @@ def getuserperformance(request):
     score = Answer.objects.filter(user_id = request.user.id).aggregate(Avg('score'))
     avg_score = score['score__avg']
     no_of_attempts = Answer.objects.filter(user_id = request.user.id).count()
-    qs = Answer.objects.filter(user_id=request.user.id).order_by('-score').only("id", "question_id", "score", "starttime", "endtime", "grammarErrors", "spellingErrors")
+    qs = Answer.objects.filter(user_id=request.user.id).order_by('-score').only("id", "question_id", "score", "starttime", "endtime", "grammarErrors", "spellingErrors", "comments")
     results = []
     avgscore = 0
     totalattempts = 0
     attempttimes = []
     lastattempted = "nil"
     
+    print(timezone.now())
     if qs:
         for attempt in qs:
             avgscore += attempt.score
             totalattempts += 1
             attempttimes.append(attempt.starttime)
             q = Question.objects.get(pk=attempt.question_id).question
-            results.append((q, round(attempt.score,2), datetime.strftime(attempt.starttime, "%d-%m-%Y"), datetime.strftime(attempt.starttime, "%H:%M"), datetime.strftime(attempt.endtime, "%H:%M"), attempt.grammarErrors, attempt.spellingErrors, attempt.question_id, attempt.id))
+            t = getFormattedDuration((attempt.endtime - attempt.starttime).total_seconds())
+            
+            results.append((q, round(attempt.score,2), datetime.strftime(attempt.endtime.astimezone(tz), "%d-%m-%Y %H:%M ("+t+")"), attempt.grammarErrors, attempt.spellingErrors, attempt.comments, attempt.id))
     if(totalattempts>0):
         avgscore /= totalattempts
         lastattempted = sorted(attempttimes)[-1]
