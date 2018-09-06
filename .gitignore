@@ -91,3 +91,4 @@ venv
 db.sqlite3
 
 .vscode
+grammarexpert/sqlite3.db

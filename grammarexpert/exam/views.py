@@ -405,7 +405,7 @@ def getallusersummary(request):
     results = []
     for result in qs:
         u = User.objects.get(pk=result['user_id'])
-        results.append({"userid":result['user_id'], "username":u.username, "profile":u.profile, "avgscore":round(result['score__avg'],2), "count":result['question__count'], "lastattempted":result['starttime__max']})
+        results.append({"userid":result['user_id'], "username":u.username, "profile":u.profile, "avgscore":round(result['score__avg'],2), "count":result['question__count'], "lastattempted":datetime.strftime(result['starttime__max'].astimezone(tz), "%d-%m-%Y %H:%M")})
     
     results.sort(key=lambda x: -x["avgscore"])
 
