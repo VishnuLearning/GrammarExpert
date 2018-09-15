@@ -39,13 +39,29 @@ def save_user_profile(sender, instance, **kwargs):
     
 
 class Question(models.Model):
+    QUESTION_TYPES = (
+        ('ES', 'Essay'),
+        ('PS', 'Picture Story'),
+        ('CP', 'Connect the phrases'),
+        ('UW', 'Use words')
+    )
     question = models.CharField(max_length = 500)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     code = models.CharField(max_length = 8,unique = True)
     word_limit = models.IntegerField(default=300)
+    min_word_count = models.IntegerField(default=150)
+    max_word_count_penalty = models.IntegerField(default=3)
+    max_word_length_penalty = models.IntegerField(default=2)
+    desired_mean_word_length = models.IntegerField(default=8)
+    desired_mean_words_per_sentence = models.IntegerField(default=20)
+    max_words_per_sentence_penalty = models.IntegerField(default=2)
     attempts_allowed = models.IntegerField(default=1)
     date_created = models.DateField(default=datetime.now)
     time_limit = models.IntegerField(default=30)
+    question_type = models.CharField(max_length=2, blank=False, choices=QUESTION_TYPES, default='ES')
+    keywords = models.TextField(default="", blank=True)
+    expanded_keywords = models.TextField(default="", blank=True)
+    picture = models.ImageField(default="/standard/es.jpg")
     # to add keywords, picture essay image, tags, question type (essay, picture essay, connect phrases, use words etc.)
     # would need separate checking algorithm for each
 

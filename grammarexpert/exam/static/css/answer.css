@@ -12,6 +12,19 @@ body{
     letter-spacing: 0.0500em;
 }
 
+.questionpic {
+    max-width:100%;
+    height:auto;
+    margin:20px auto;
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .questionpic {
+        max-width:640px;
+    }
+}
+
 #homelink {
     text-decoration: none;
     color:white;

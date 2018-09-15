@@ -14,6 +14,9 @@
             <h3 class="col-sm-8 col-md-8">{{ question.question }}</h3>
             <h4 class="col-sm-3 col-md-3" id="time">{{question.time_limit}}</h4>
     </div>
+    {% if question.question_type == 'PS' %}
+    <img class="questionpic img-fluid" src="{{question.picture.url}}"/>
+    {% endif %}
     <div class="row">
         <div class="col-sm-1 col-md-1"></div>
         <textarea autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"

@@ -23,5 +23,6 @@ urlpatterns = [
     path('analytics/', views.getallusersummary, name='analytics'),
     path('getuserperfdata/<int:uid>',views.getuserperfdata, name = 'getuserperfdata'),
     path('canattempt/<str:code>',views.canattempt, name = 'canattempt'),
+    path('deleteattempt/<int:attemptid>',views.deleteattempt, name = 'deleteattempt'),
     path('updatequestion/<int:pk>',views.EditQuestion.as_view(), name = 'updatequestion'),
 ]

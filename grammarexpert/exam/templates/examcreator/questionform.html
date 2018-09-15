@@ -1,0 +1,101 @@
+{% load bootstrap4 %}
+<form role="form" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-md-6">
+            {%  bootstrap_field form.question_type %}
+        </div>
+        <div id="pic_container" class="col-md-6">
+            {%  bootstrap_field form.picture %}
+        </div>
+    </div>
+    <div class="row">
+
+    <div class="col-md-12">
+        {%  bootstrap_field form.question %}
+    </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            {%  bootstrap_field form.word_limit %}
+        </div>
+        
+        <div class="col-md-4">
+            {%  bootstrap_field form.time_limit %}
+        </div>
+        <div class="col-md-4">
+            {%  bootstrap_field form.attempts_allowed %}
+        </div>
+    </div>
+    <div class="card mb-12 bg-light text-dark">
+        <div class="card-header" role="button" data-toggle="collapse" data-target="#advanced" aria-expanded="true" aria-controls="advanced">
+            Advanced Options
+        </div>
+        <div id="advanced" class="collapse" aria-labelledby="advanced" data-parent="#accordion">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        {% bootstrap_field form.keywords %}
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% bootstrap_field form.min_word_count %}
+                            </div>
+                            <div class="col-md-6">
+                                {% bootstrap_field form.max_word_count_penalty %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% bootstrap_field form.desired_mean_word_length %}
+                            </div>
+                            <div class="col-md-6">
+                                {% bootstrap_field form.max_word_length_penalty %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% bootstrap_field form.desired_mean_words_per_sentence %}
+                            </div>
+                            <div class="col-md-6">
+                                {% bootstrap_field form.max_words_per_sentence_penalty %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p>
+                    Note: For connect phrases question, enter each phrase in keywords as a separate line
+                </p>
+            </div>
+        </div>
+    
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="reset" class="btn btn-default">Reset</button>
+</form>
+
+<script>
+    $(function() {
+        var updatequestiontype = function() {
+            var e = $('#id_question_type');
+            if(e.val()=='PS') {
+                $('#pic_container').show();
+            } else {
+                $('#pic_container').hide();
+                $('#id_picture').val('');
+            }
+            if(e.val()=='PS') {
+                $('#id_question').val('Write a story based on the given picture');
+            } else if(e.val()=='CP') {
+                $('#id_question').val('Connect the given phrases in given order to make a story');
+            } else if(e.val()=='UW') {
+                $('#id_question').val('Write an essay or story using all the provided words');
+            }
+        }
+        updatequestiontype();
+        $('#id_question_type').change(function() {
+            updatequestiontype();
+        })
+    })
+</script>

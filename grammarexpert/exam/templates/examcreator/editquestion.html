@@ -9,33 +9,29 @@
  .qcreate {
      font-weight: bold;
  }  
- #qform {
+
+ .card {
      margin-bottom:30px;
  }
+
+ .card-header {
+     cursor:pointer;
+ }
+
+ #advanced .row {
+     margin-bottom: 20px;
+ }
+
+ h1 {
+     padding:20px 0;
+     text-align:center;
+     background: #cccccc;
+     margin-bottom:50px;
+ }
 </style>
-<h1 style="text-align: center; margin:10px auto;">Question Editor</h1>
+<h1>Question Editor</h1>
 <div class="container masthead text-center">
-    <form role="form" method="post">
-            {% csrf_token %}
-            <div class="row">
-            <div class="col-md-12">
-                {%  bootstrap_field form.question %}
-            </div>
-            </div>
-            <div class="row">
-            <div class="col-md-4">
-                {%  bootstrap_field form.word_limit %}
-            </div>
-            <div class="col-md-4">
-                    {%  bootstrap_field form.time_limit %}
-            </div>
-            <div class="col-md-4">
-                    {%  bootstrap_field form.attempts_allowed %}
-            </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Edit Question</button>
-            <button type="reset" class="btn btn-default">Reset</button>
-        </form>
+    {% include 'examcreator/questionform.html' %}
 </div>
 <div style="height:30px;"></div>
 

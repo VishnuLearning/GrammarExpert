@@ -27,7 +27,7 @@ import threading
 import pytz
 from django.utils import timezone
 
-datetimeformat = "%Y %d %m %H:%M"
+datetimeformat = "%Y %d %m %H:%M:%S %Z%z"
 tz = pytz.timezone('Asia/Kolkata') #TODO: set to users timezone somehow
 
 @login_required(login_url="login")
@@ -154,17 +154,25 @@ def questionmanager(request):
     user = request.user
     context = dict()
     if request.method == "POST":
-        form = QuestionForm(request.POST)
+        form = QuestionForm(request.POST,request.FILES)
         code = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=8))
         c = Question.objects.filter(code=code)
         while len(list(c))>0:
             code = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=8))
             c = Question.objects.filter(code=code)
+        
         if form.is_valid():
             question = form.save(commit = False)
             question.user = request.user
             question.code = code
+
+            if question.question_type!='PS':
+                question.picture="/standard/"+question.question_type.lower()+".jpg"
+
             question.save()
+            return HttpResponseRedirect("questionmanager")
+        else:
+            print("form is not valid",form.errors)
     else:
         form = QuestionForm()
     context['form'] = form
@@ -199,8 +207,9 @@ def main_view(request):
 
 @login_required(login_url="login")
 def attempt(request,code):
-    s = datetime.strftime(datetime.now(), datetimeformat)
-    
+    now_utc = datetime.now(pytz.timezone('UTC'))
+    s = now_utc.strftime(datetimeformat)
+    print(s)
     q = Question.objects.get(code=code)
     a = list(Answer.objects.filter(user_id=request.user.id,question_id=q.id))
     if len(a) < q.attempts_allowed:
@@ -245,8 +254,8 @@ def fetch_results(request):
            return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
 
         starttime = datetime.strptime(request.POST['starttime'], datetimeformat)
-        endtime = datetime.now()
-        d = Report(essay, q.word_limit).reprJSON()
+        endtime = datetime.now(pytz.timezone('UTC'))
+        d = Report(essay, q).reprJSON()
         score = d['score']
         grammarCount = d['grammarErrorCount']
         spellingCount = d['spellingErrorCount']
@@ -263,6 +272,18 @@ def updatequestion(request, qid):
     q = Question.objects.get(pk = qid)
     return render(request,"examcreator/editquestion.html",{'form':form})
         
+@login_required(login_url="login")
+@permission_required('exam.create_test')
+def deleteattempt(request, attemptid):
+    a = Answer.objects.get(pk=attemptid)
+    q = Question.objects.get(pk = a.question_id)
+    if request.user == q.user:
+        a.delete()
+        return JsonResponse({'status': 'OK'})
+    else:
+        return JsonResponse({'status': 'Permission Denied'})
+
+
 @login_required(login_url="login")
 @permission_required('exam.create_test')
 def getquestiondata(request, qid):
@@ -292,10 +313,10 @@ def delete_question(request, qid):
     question = Question.objects.get(pk=qid)
     # add case where user can del question which is created by him only
     if question.user_id != request.user.id:
-        return HttpResponse("Not allowed")
+        return JsonResponse({"status": "Permission Denied"})
     else:
         question.delete()
-        return redirect('questionmanager')
+        return JsonResponse({"status": "OK"})
 
 def getFormattedDuration(timeinsec):
     timeinsec = int(timeinsec)
@@ -335,7 +356,7 @@ def leaderboard(request, qid):
             t = getFormattedDuration((attempt.endtime - attempt.starttime).total_seconds())
             results.append((attempt.user, rank, round(attempt.score,2), datetime.strftime(attempt.endtime.astimezone(tz), "%d-%m-%Y %H:%M ("+t+")"), attempt.id, attempt.comments))
             rank += 1
-    return render(request, template_name="examcreator/leaderboard.html", context={"results": results, "question":q.question, "questionsetter":q.user==request.user})
+    return render(request, template_name="examcreator/leaderboard.html", context={"results": results, "question":q, "questionsetter":q.user==request.user})
 
 @login_required(login_url="login")
 def getuserattemptdata(request):

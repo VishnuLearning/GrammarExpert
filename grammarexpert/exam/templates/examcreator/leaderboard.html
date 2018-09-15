@@ -27,12 +27,20 @@
     .commentfailed {
         border-color:red;
     }
+    .questionpic {
+        max-width:100px;
+        margin:10px auto;
+    }
+    .ps {
+        max-width:400px;
+    }
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
 <div class="masthead text-center">
  <div class="container-fluid topheading">
         <h2>Leaderboard</h2> 
-        <p>{{question}}</p> 
+        <img class="questionpic {{question.question_type}}" src="{{question.picture.url}}"/>
+        <p>{{question.question}}</p> 
         <p>Total Attempts: <span id="count"></span></p> 
 </div>
 <div class="container">
@@ -52,7 +60,7 @@
     <tbody>
       {% for result in results %}
       <tr>
-        <td class="userattempt" onclick = "getResults({{result.4}}, '{{result.0}}')">{{result.0}}</td>
+        <td class="userattempt" onclick = "getResults({{result.4}}, '{{result.0}}', this)">{{result.0}}</td>
         <td>{{result.1}}</td>
         <td>{{result.2}}</td>
         <td>{{result.3}}</td>
@@ -66,7 +74,6 @@
 </div>
     <div class="modal fade" id="myModal" role="dialog">
         <div class="modal-dialog modal-lg">
-        
             <!-- Modal content-->
             <div class="modal-content">
             <div class="modal-header">
@@ -75,6 +82,7 @@
             </div>
             <div class="modal-body">
                 {% include "examuser/markedscript.html" %}
+                <button type="button" class = "btn btn-danger" onclick="deleteattempt();">Delete This Attempt</button>
             </div>
             </div>   
         </div>
@@ -84,14 +92,33 @@
     <script src="{% static "js/displayresults.js" %}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>    
     <script>
-        var getResults = function (qid, uname) {
+        var chosenAttemptId = null;
+        var mytable;
+        var chosenAttemptRow = null;
+        var getResults = function (attemptid, uname, clickedtd) {
+            chosenAttemptId = attemptid;
+            chosenAttemptRow = $(clickedtd).parents('tr');
+            //console.log(clickedtd, chosenAttemptRow);
             var url = "/getresult/";
             $('#username').text(uname);
-            $.post(url, {"id":qid}, function (data) {
+            $.post(url, {"id":attemptid}, function (data) {
                 highlightErrors(data);
                 $('#myModal').modal('show');
             }, "json")
         };
+
+        var deleteattempt = function () {
+                if (confirm("Are you sure you want to delete this attempt?")) {
+                    $.getJSON("/deleteattempt/" + chosenAttemptId, function (data) {
+                        if (data["status"] != "OK") {
+                            alert(data["status"]);
+                        } else {
+                            mytable.row(chosenAttemptRow).remove().draw();
+                            $('#myModal').modal('hide');
+                        }
+                    })
+                }
+        }
 
         $(document).ready(function() {
             $('.commentinput').change(function() {
@@ -106,7 +133,7 @@
                     }, "json");
             });
 
-            var mytable = $('#leaderboard').DataTable({
+            mytable = $('#leaderboard').DataTable({
                 lengthMenu: [
                     [ 25, 50, 100, -1 ],
                     [ '25', '50', '100', 'All' ]

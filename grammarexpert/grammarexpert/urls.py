@@ -15,6 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,3 +28,6 @@ handler404 = 'exam.views.not_found'
 handler500 = 'exam.views.server_error'
 handler403 = 'exam.views.permission_denied'
 handler400 = 'exam.views.bad_request'
+
+urlpatterns += staticfiles_urlpatterns()
+urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)

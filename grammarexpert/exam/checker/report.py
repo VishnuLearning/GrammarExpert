@@ -7,7 +7,7 @@ languagecheckurl = 'http://localhost:8082/v2/check'
 class Report:
     stop_words = set(stopwords.words('english'))
 
-    def __init__(self, essay, word_limit):
+    def __init__(self, essay, question):
         global languagecheckurl
 
         self.essay = re.sub(' +',' ',essay)
@@ -22,12 +22,12 @@ class Report:
         self.score = 10
 
         #word limit penalty
-        x = word_limit - self.wordCount
+        x = question.word_limit - self.wordCount
         self.wordlimitpenalty = 0
-        if(self.wordCount <= word_limit//2):
+        if(self.wordCount <= question.word_limit//2):
             self.wordlimitpenalty = 10
         elif x > 0:
-            self.wordlimitpenalty = 3*2*(x)/word_limit
+            self.wordlimitpenalty = 3*2*(x)/question.word_limit
         
         #average_words_per_sentences
         sentencesList = self.essay.split('.')
@@ -39,23 +39,23 @@ class Report:
         #avergage_word_length_without_stopwords
         self.avg_word_length_without_stopwords = sum(map(len, words_without_stop_words))/len(words_without_stop_words)
  
-        desired_words_per_sentence = 20
-        min_words_per_sentence = 10
+        desired_words_per_sentence = question.desired_mean_words_per_sentence
+        min_words_per_sentence = question.desired_mean_words_per_sentence//2
         self.sentencequalitypenalty=0
         #penality regarding avg_words_per_sentences
         if self.avg_words_per_sentences < min_words_per_sentence:
-            self.sentencequalitypenalty = 2
+            self.sentencequalitypenalty = question.max_words_per_sentence_penalty
         elif self.avg_words_per_sentences <=desired_words_per_sentence:
-            self.sentencequalitypenalty = ((desired_words_per_sentence-self.avg_words_per_sentences)/desired_words_per_sentence)*4
+            self.sentencequalitypenalty = ((desired_words_per_sentence-self.avg_words_per_sentences)/desired_words_per_sentence)*question.max_words_per_sentence_penalty*2
 
-        desired_word_length = 8
-        min_avg_word_len = 4
+        desired_word_length = question.desired_mean_word_length
+        min_avg_word_len = question.desired_mean_word_length // 2
         self.wordqualitypenalty = 0
         if self.avg_word_length_without_stopwords < min_avg_word_len:
-            self.wordqualitypenalty = 2
+            self.wordqualitypenalty = question.max_word_length_penalty
         #penality regarding avg_word_length without_stop_words
         elif self.avg_word_length_without_stopwords<desired_word_length:
-            self.wordqualitypenalty = ((desired_word_length-self.avg_word_length_without_stopwords)/desired_word_length)*4
+            self.wordqualitypenalty = ((desired_word_length-self.avg_word_length_without_stopwords)/desired_word_length)*question.max_word_length_penalty*2
 
         
         #spellingmistakes and grammar mistakes
@@ -71,6 +71,9 @@ class Report:
         self.wordlimitpenalty = round(self.wordlimitpenalty, 2)
         self.wordqualitypenalty = round(self.wordqualitypenalty, 2)
         self.sentencequalitypenalty = round(self.sentencequalitypenalty, 2)
+
+        #TODO: check connect phrases or use words contraint
+        #TODO: if keywords are there for context checking do that as well
 
     def reprJSON(self):
         return dict(answer=self.essay, score = self.score,errors = [e.reprJSON() for e in self.errors],

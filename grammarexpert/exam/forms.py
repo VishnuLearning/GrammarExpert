@@ -33,4 +33,4 @@ class ProfileForm(forms.ModelForm):
 class QuestionForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ["question", "attempts_allowed", "word_limit", "time_limit"]
+        exclude=["user", "code", "date_created", "expanded_keywords"]
