@@ -94,4 +94,3 @@ db.sqlite3
 grammarexpert/sqlite3.db
 grammarexpert/media/
 !grammarexpert/media/standard/*
-
