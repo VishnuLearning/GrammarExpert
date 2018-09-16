@@ -1,5 +1,6 @@
 {% include "header.html" %}
 {% load static %}
+{% load bootstrap4 %}
 <style>
     .userattempt {
         text-decoration: underline;
@@ -33,14 +34,30 @@
         <div class="col-sm-8 col-md-8" id="perfChartContainer">
         </div>
         <div class="col-sm-4 col-md-4">
-            <p>Filter by score range</p>
-            <form action="/analytics/" class="form-inline justify-content-center" role="form" method="POST">
+            <form action="/analytics/" role="form" method="POST">
                 {% csrf_token %}
-                <label for="minscore" class="mr-sm-2" >from</label>
-                <input type="number" step="1" min="0" max="{{attrs.maxscore}}" value="{{attrs.minscore}}" id="minscore" name="minscore" class="form-control  mr-sm-2"/>
-                <label for="maxscore" class="mr-sm-2">to</label>
-                <input type="number" step="1" min="{{attrs.minscore}}" max="10" value="{{attrs.maxscore}}" id="maxscore" name="maxscore" class="form-control mr-sm-2"/>
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <p>Filter score by range</p>
+                <div class= "form-inline justify-content-center">
+                    
+                    <label for="minscore" class="mr-sm-2" >from</label>
+                    <input type="number" step="1" min="0" max="{{attrs.maxscore}}" value="{{attrs.minscore}}" id="minscore" name="minscore" class="form-control  mr-sm-2"/>
+                    <label for="maxscore" class="mr-sm-2">to</label>
+                    <input type="number" step="1" min="{{attrs.minscore}}" max="10" value="{{attrs.maxscore}}" id="maxscore" name="maxscore" class="form-control mr-sm-2"/>
+                </div>
+                <p style="margin-top:20px;">Filter by Question type</p>
+                <div class= "form-inline justify-content-center">
+                    <select class="form-control" name="qtype">
+                        <option value="ALL">All Types</option>
+                        {% for q in qtypes %}
+                        {% if q.0 == chosen %}
+                        <option value="{{q.0}}" selected="selected">{{q.1}}</option>
+                        {% else %}
+                        <option value="{{q.0}}">{{q.1}}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top:20px;">Submit</button>
                 <!--TODO: filter by branch etc.-->
             </form>
             <p class="stats">Total Test Takers: <span id="takercount">--</span></p>

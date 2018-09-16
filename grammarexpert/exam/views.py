@@ -418,12 +418,17 @@ def getuserperfdata(request, uid):
 def getallusersummary(request):
     minscore = 0
     maxscore = 10
+    qtype="ALL"
     if request.method=="POST":
         minscore = request.POST["minscore"]
         maxscore = request.POST["maxscore"]
+        qtype = request.POST["qtype"]
 
     #TODO: improve query performance
-    qs = Answer.objects.filter(question__user_id=request.user.id, score__gte = minscore, score__lte = maxscore).select_related().values("user_id").annotate(Avg('score'), Count('question'), Max('starttime'))
+    if qtype!='ALL':
+        qs = Answer.objects.filter(question__user_id=request.user.id, score__gte = minscore, score__lte = maxscore, question__question_type = qtype).select_related().values("user_id").annotate(Avg('score'), Count('question'), Max('starttime'))
+    else:
+        qs = Answer.objects.filter(question__user_id=request.user.id, score__gte = minscore, score__lte = maxscore).select_related().values("user_id").annotate(Avg('score'), Count('question'), Max('starttime'))
     results = []
     for result in qs:
         u = User.objects.get(pk=result['user_id'])
@@ -432,4 +437,4 @@ def getallusersummary(request):
     results.sort(key=lambda x: -x["avgscore"])
 
     attrs = {"minscore":minscore, "maxscore":maxscore}
-    return render(request, template_name="examcreator/getallusersummary.html", context={"results":results, "attrs":attrs})
+    return render(request, template_name="examcreator/getallusersummary.html", context={"results":results, "attrs":attrs, "qtypes":Question.QUESTION_TYPES, "chosen":qtype})
