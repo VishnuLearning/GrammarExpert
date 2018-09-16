@@ -11,11 +11,21 @@
 
 <div class="container masthead text-center" style="padding:30px 0;">
     <div class="row">
-            <h3 class="col-sm-8 col-md-8">{{ question.question }}</h3>
+            <h4 class="col-sm-8 col-md-8">{{ question.question }}</h4>
             <h4 class="col-sm-3 col-md-3" id="time">{{question.time_limit}}</h4>
     </div>
     {% if question.question_type == 'PS' %}
     <img class="questionpic img-fluid" src="{{question.picture.url}}"/>
+    {% elif question.question_type == 'CP' or question.question_type == 'UW' %}
+    <div class="row">
+        <div class="col-sm-1 col-md-1"></div>
+        <div class="phrase-container col-sm-10 col-md-10">
+            <h4>Words or Phrases to use</h4>
+            <pre>{{question.keywords}}</pre>
+        </div>
+    
+        <div class="col-sm-1 col-md-1"></div>
+    </div>
     {% endif %}
     <div class="row">
         <div class="col-sm-1 col-md-1"></div>

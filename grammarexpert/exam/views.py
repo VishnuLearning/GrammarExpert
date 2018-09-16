@@ -195,11 +195,11 @@ def practice(request):
         if n>0:
             avg = s/n
         if len(a) < q.attempts_allowed:
-            results.append((q, True, avg, n, q.attempts_allowed))
+            results.append((q, True, avg, n))
         else:
             
-            results.append((q, False, avg, n, q.attempts_allowed))
-    return render(request, template_name = 'examuser/practice.html', context={"questions":results})
+            results.append((q, False, avg, n))
+    return render(request, template_name = 'examuser/practice.html', context={"questions":results, "qtypes":Question.QUESTION_TYPES})
 
 def main_view(request):
     return render(request,template_name="homepage.html", context={"user": request.user})

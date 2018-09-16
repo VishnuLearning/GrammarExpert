@@ -79,6 +79,12 @@ span.correct {
     color:#444444;
 }
 
+.phrase-container {
+    border:1px solid gray;
+    margin-top:30px;
+    padding: 20px;
+}
+
 .hidden {
     display: none;
 }

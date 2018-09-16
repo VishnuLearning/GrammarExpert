@@ -100,7 +100,7 @@ img.questionpic {
         <tbody>
             {% for question in object_list %}
             <tr>
-            <td><img class="questionpic img-thumbnail" src="{{question.picture.url}}" alt="{{question.question_type}}"/></td>
+            <td data-search="{{question.question_type}}"><img class="questionpic img-thumbnail" src="{{question.picture.url}}" alt="{{question.question_type}}"/></td>
             <td>{{question}}</td>
             <td>{{question.code}}</td>
             <td>{{question.date_created}}</td>
