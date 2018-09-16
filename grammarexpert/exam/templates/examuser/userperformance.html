@@ -25,6 +25,14 @@
     #attemptstable_wrapper {
         margin-bottom: 30px;
     }
+
+    img.questiontype {
+        width:100px;
+        height:75px;
+        object-fit: cover;
+        max-width:100px;
+    }
+
 </style>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
 
@@ -32,30 +40,60 @@
         
  <div class="container-fluid topheading">
         <h2>Your Performance</h2> 
-        {% include "examuser/userperformancechart.html" %}
-</div>
+        <div class="row">
+            <div class="col-sm-8 col-md-8" id="perfChartContainer">
+            </div>
+            <div class="col-sm-4 col-md-4">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td>Avg Score</td>
+                            <td>{{avgscore}}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Attempts</td>
+                            <td>{{totalattempts}}</td>
+                        </tr>
+                        <tr>
+                            <td>Last Attemptted</td>
+                            <td>{{lastattempted}}</td>
+                        </tr>
+                        <tr>
+                            <td>Filter by Question type</td>
+                            <td>
+                                <select class="form-control" id="typeselect">
+                                    <option value="">All Types</option>
+                                    {% for k,v in qtypes.items %}
+                                    <option value="{{k}}">{{v}}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
 <div class="container">
    
 <table id="attemptstable" class="table table-responsive-sm table-responsive-md">
     <thead>
       <tr>
+        <th>Type</th>
         <th>Question</th>
         <th>Score</th>
         <th>Time</th>
-        <th>Grammar Errors</th>
-        <th>Spelling Errors</th>
         <th>Comments</th>
       </tr>
     </thead>
     <tbody>
       {% for result in results %}
       <tr>
-        <td class="userattempt" onclick = "getResults({{result.6}}, '{{result.0}}')">{{result.0}}</td>
+        <td data-search="{{result.0.question_type}}"><img class="questiontype img-thumbnail" src="{{result.0.picture.url}}" alt="{{result.0.question_type}}"/></td>
+        <td class="userattempt" onclick = "getResults({{result.4}}, '{{result.0.question}}')">{{result.0.question}}</td>
         <td>{{result.1}}</td>
         <td>{{result.2}}</td>
         <td>{{result.3}}</td>
-        <td>{{result.4}}</td>
-        <td>{{result.5}}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -78,32 +116,90 @@
     </div>
 </div>
     {% include "footer.html" %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
     <script src="{% static "js/displayresults.js" %}"></script>
-
-    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>  
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
     <script>
+        var mytable;
         var getResults = function (id, qname) {
             var url = "/getresult/";
             $('#question').text(qname);
             console.log(id, qname);
-            $.post(url, {"id":id}, function (data) {
+            $.post(url, { "id": id }, function (data) {
                 highlightErrors(data);
                 $('#myModal').modal('show');
             }, "json")
         }
-        $(document).ready(function() {
-            $('#attemptstable').DataTable({
+        $(document).ready(function () {
+            mytable = $('#attemptstable').DataTable({
                 lengthMenu: [
-                    [ 25, 50, 100, -1 ],
-                    [ '25', '50', '100', 'All' ]
+                    [25, 50, 100, -1],
+                    ['25', '50', '100', 'All']
                 ],
                 buttons: [
                     'pageLength'
                 ]
             });
-        } );
-        //make ajax call
+
+
+            $('#typeselect').change(function () {
+                mytable.column(0).search($(this).val(), false, true).draw();
+            })
+
+            var makechart = function () {
+                var data = mytable.rows({ filter: 'applied' }).data();
+                // create chart from data here
+                var chartdata = new Array(data.length);
+                var colordata = new Array(data.length);
+                var labels = new Array(data.length);
+                for (var i = 0; i < data.length; i++) {
+                    chartdata[i] = data[i][2]; //TODO: change index when more parameters come
+                    labels[i] = data[i][3];
+                }
+                // sort the data by avg score
+                $('#perfChartContainer').empty();
+                $('#perfChartContainer').append(
+                    '<canvas id="perfChart" width="400" height="200"></canvas>');
+                var canvas = document.getElementById("perfChart");
+                var ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                var perfChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: chartdata,
+                            borderColor: "#8e5ea2",
+                            backgroundColor: "#8e5ea222"
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: { display: false },
+                        scales: {
+                            yAxes: [{
+                                ticks: { min: 0, max: 10 },
+                                scaleLabel: { display: true, labelString: 'score' }
+                            }],
+                            xAxes: [{
+                                gridLines: { display: false },
+                                ticks: { display: false }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            makechart();
+            mytable.on('order.dt', function () {
+                makechart();
+            });
+            mytable.on('search.dt', function () {
+                makechart();
+            });
+        });
+                //make ajax call
     </script>
-    <script src="{% static "js/userperformancechart.js"%}"></script>
 </body>
 </html>

@@ -382,22 +382,23 @@ def getuserperformance(request):
     totalattempts = 0
     attempttimes = []
     lastattempted = "nil"
-    
+    qtypes = {}
     print(timezone.now())
     if qs:
         for attempt in qs:
             avgscore += attempt.score
             totalattempts += 1
             attempttimes.append(attempt.starttime)
-            q = Question.objects.get(pk=attempt.question_id).question
+            q = Question.objects.get(pk=attempt.question_id)
             t = getFormattedDuration((attempt.endtime - attempt.starttime).total_seconds())
-            
-            results.append((q, round(attempt.score,2), datetime.strftime(attempt.endtime.astimezone(tz), "%d-%m-%Y %H:%M ("+t+")"), attempt.grammarErrors, attempt.spellingErrors, attempt.comments, attempt.id))
+            if q.question_type not in qtypes:
+                qtypes[q.question_type] = q.get_question_type_display
+            results.append((q, round(attempt.score,2), datetime.strftime(attempt.endtime.astimezone(tz), "%d-%m-%Y %H:%M ("+t+")"), attempt.comments, attempt.id))
     if(totalattempts>0):
         avgscore /= totalattempts
         lastattempted = sorted(attempttimes)[-1]
     
-    return render(request, template_name="examuser/userperformance.html", context={"results": results, "user":request.user, "avgscore":round(avgscore,2), "totalattempts":totalattempts, "lastattempted":lastattempted})
+    return render(request, template_name="examuser/userperformance.html", context={"results": results, "user":request.user, "avgscore":round(avgscore,2), "totalattempts":totalattempts, "lastattempted":lastattempted, "qtypes":qtypes})
 
 @login_required(login_url="login")
 @permission_required('exam.create_test')
