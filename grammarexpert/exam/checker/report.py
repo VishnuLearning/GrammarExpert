@@ -22,12 +22,12 @@ class Report:
         self.score = 10
 
         #word limit penalty
-        x = question.word_limit - self.wordCount
+        r = 1 - (self.wordCount-question.min_word_count)/(question.word_limit - question.min_word_count)
         self.wordlimitpenalty = 0
-        if(self.wordCount <= question.word_limit//2):
+        if(self.wordCount < question.min_word_count):
             self.wordlimitpenalty = 10
-        elif x > 0:
-            self.wordlimitpenalty = 3*2*(x)/question.word_limit
+        elif r > 0:
+            self.wordlimitpenalty = r*question.max_word_count_penalty
         
         #average_words_per_sentences
         sentencesList = self.essay.split('.')
