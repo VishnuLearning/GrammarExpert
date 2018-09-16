@@ -177,6 +177,7 @@ def questionmanager(request):
         form = QuestionForm()
     context['form'] = form
     context['object_list'] = Question.objects.filter(user_id=request.user.id)
+    context['qtypes'] = Question.QUESTION_TYPES
     return render(request, template_name = 'examcreator/questionmanager.html', context=context)
 
 @login_required(login_url="login")
