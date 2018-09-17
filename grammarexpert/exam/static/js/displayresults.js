@@ -68,6 +68,7 @@ var highlightErrors = function (data) {
     $('#score').text(round(data['score']));
     $('#sentencequality').text(round(data['sentencequalitypenalty']));
     $('#wordquality').text(round(data['wordqualitypenalty']));
+    $('#requiredtext').text(data['requiredtextpenalty']);
     var e = $('#essay');
     e.empty();
     if (errors.length == 0) {
