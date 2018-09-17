@@ -40,12 +40,10 @@ class Report:
         for phrase in phrases:
             loc = essay.find(phrase)
             if loc != -1:
-                print(loc, phrase, len(phrase))
                 numfound += 1
                 if loc >= lastloc:
                     inorder += 1
                 lastloc = loc + len(phrase)
-        print(numfound, inorder)
         return (1 - inorder/len(phrases))*10
 
 
