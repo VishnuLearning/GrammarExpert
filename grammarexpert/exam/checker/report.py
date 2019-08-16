@@ -69,7 +69,10 @@ class Report:
         self.score = 10
 
         #word limit penalty
-        r = 1 - (self.wordCount-question.min_word_count)/(question.word_limit - question.min_word_count)
+        if question.word_limit > question.min_word_count:
+            r = 1 - (self.wordCount-question.min_word_count)/(question.word_limit - question.min_word_count)
+        else:
+            r=0
         self.wordlimitpenalty = 0
         if(self.wordCount < question.min_word_count):
             self.wordlimitpenalty = 10
@@ -84,7 +87,10 @@ class Report:
         words_without_stop_words = [word for word in self.words if word not in Report.stop_words]
         
         #avergage_word_length_without_stopwords
-        self.avg_word_length_without_stopwords = sum(map(len, words_without_stop_words))/len(words_without_stop_words)
+        if len(words_without_stop_words)==0:
+            self.avg_word_length_without_stopwords = 0
+        else:
+            self.avg_word_length_without_stopwords = sum(map(len, words_without_stop_words))/len(words_without_stop_words)
  
         desired_words_per_sentence = question.desired_mean_words_per_sentence
         min_words_per_sentence = question.desired_mean_words_per_sentence//2

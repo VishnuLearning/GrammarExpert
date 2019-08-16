@@ -3,9 +3,15 @@ var wordlimit = 150;
 
 var submitEssay = function (e) {
     //TODO: decide about word limit
+    let text = $('#id_answer').val();
+
+    if(!text || text.trim().length < 10 ) { //TODO: see if we want wordlimit check
+        alert("Please write more and then submit.")
+        return;
+    }
     clearInterval(timer);
     $('#loader').show();
-    let text = $('#id_answer').val();
+    
     let qid = $('#myqid').text();
     let starttime = $('#starttime').text();
     console.log(qid);
@@ -18,6 +24,7 @@ var submitEssay = function (e) {
         }
     ).done(function (data) {
         data = JSON.parse(data);
+        console.log(data);
         if (data['status']=='OK') {
             highlightErrors(data);
             $('#id_answer').hide();
