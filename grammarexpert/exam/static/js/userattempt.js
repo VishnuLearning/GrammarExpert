@@ -15,26 +15,26 @@ var submitEssay = function (e) {
             'essay': text,
             'qid': qid,
             'starttime':starttime
-        },
-        function (data) {
-            if (data['status']=='OK') {
-                highlightErrors(data);
-                $('#id_answer').hide();
-                $('#submit_button').hide();
-                $('#wordcount').hide();
-                $('#loader').hide();
-            } else if (data['status']=='duplicate') {
-                alert(data['error']);
-                $('#id_answer').hide();
-                $('#submit_button').hide();
-                $('#wordcount').hide();
-                $('#loader').hide();
-            } else { //error
-                alert(data['error'] + " Please try submitting after some time");
-                $('#loader').hide();
-            }
-        }, "json"
-    )
+        }
+    ).done(function (data) {
+        data = JSON.parse(data);
+        if (data['status']=='OK') {
+            highlightErrors(data);
+            $('#id_answer').hide();
+            $('#submit_button').hide();
+            $('#wordcount').hide();
+        } else if (data['status']=='duplicate') {
+            alert(data['error']);
+        } else { //error
+            alert(data['error'] + " Please try submitting after some time");
+        }
+    })
+    .fail(function() {
+        alert("Server unavailable or busy. Please try submitting after some time");
+    })
+    .always(function() {
+        $('#loader').hide();
+    })
 }
 
 $('#submit_button').click(submitEssay);
