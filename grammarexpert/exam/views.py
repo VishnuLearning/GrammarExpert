@@ -32,14 +32,9 @@ import subprocess
 logger = logging.getLogger(__name__)
 process = None
 
-def readLanguageToolResponse():
-    if process:
-        logger.info(process.communicate()[0])
-        logger.info(process.communicate()[1])
-
 def startLanguageTool():
     args = ["java", "-cp", "../../LanguageTool-4.6/languagetool-server.jar", "org.languagetool.server.HTTPServer", "--port", "8082"]
-    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(args)
     logger.info("started language tool:", process.pid)
 
 datetimeformat = "%Y %d %m %H:%M:%S %Z%z"
@@ -272,13 +267,11 @@ def fetch_results(request):
         endtime = datetime.now(pytz.timezone('UTC'))
         try:
             report = Report(essay, q)
-            readLanguageToolResponse()
             d = report.reprJSON()
         except Exception as e:
             if (e.__class__.__name__ == 'ConnectionError'):
                 startLanguageTool()
                 report = Report(essay, q)
-                readLanguageToolResponse()
                 d = report.reprJSON()
             else:
                 logger.error(e)
