@@ -26,6 +26,21 @@ import string
 import threading
 import pytz
 from django.utils import timezone
+import logging
+import subprocess
+
+logger = logging.getLogger(__name__)
+process = None
+
+def readLanguageToolResponse():
+    if process:
+        logger.info(process.communicate()[0])
+        logger.info(process.communicate()[1])
+
+def startLanguageTool():
+    args = ["java", "-cp", "../../LanguageTool-4.6/languagetool-server.jar", "org.languagetool.server.HTTPServer", "--port", "8082"]
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    logger.info("started language tool:", process.pid)
 
 datetimeformat = "%Y %d %m %H:%M:%S %Z%z"
 tz = pytz.timezone('Asia/Kolkata') #TODO: set to users timezone somehow
@@ -101,7 +116,7 @@ def signup(request):
             message = render_to_string('registration/acc_active_email.html', {
                 'user': user,
                 'domain': current_site.domain,
-                'uid':uid.decode('utf-8'),
+                'uid':uid,
                 'token':tok,
             })
             to_email = user_form.cleaned_data.get('email')
@@ -136,16 +151,16 @@ def activate(request, uidb64, token, backend='django.contrib.auth.backends.Model
     else:
         return render(request, 'registration/message.html', {"message":'Activation link is invalid!'})
 
-def not_found(request):
+def not_found(request, exception):
     return render(request, 'errors/not_found.html')
 
 def server_error(request):
     return render(request, 'errors/server_error.html')
 
-def permission_denied(request):
+def permission_denied(request, exception):
     return render(request, 'errors/permission_denied.html')
 
-def bad_request(request):
+def bad_request(request, exception):
     return render(request, 'errors/bad_request.html')
 
 @login_required(login_url="login")
@@ -210,7 +225,6 @@ def main_view(request):
 def attempt(request,code):
     now_utc = datetime.now(pytz.timezone('UTC'))
     s = now_utc.strftime(datetimeformat)
-    print(s)
     q = Question.objects.get(code=code)
     a = list(Answer.objects.filter(user_id=request.user.id,question_id=q.id))
     if len(a) < q.attempts_allowed:
@@ -252,18 +266,29 @@ def fetch_results(request):
         q = Question.objects.get(pk=qid)
 
         if not can_attempt_question(request.user.id, qid):
-           return JsonResponse({'status':'Already Submitted. Further submissions not allowed'})
+            return JsonResponse({'status':'duplicate', 'error':'Already Submitted. Further submissions not allowed'})
 
         starttime = datetime.strptime(request.POST['starttime'], datetimeformat)
         endtime = datetime.now(pytz.timezone('UTC'))
-        d = Report(essay, q).reprJSON()
+        try:
+            report = Report(essay, q)
+            readLanguageToolResponse()
+            d = report.reprJSON()
+        except Exception as e:
+            if (e.__class__.__name__ == 'ConnectionError'):
+                startLanguageTool()
+                report = Report(essay, q)
+                readLanguageToolResponse()
+                d = report.reprJSON()
+
+        d['status'] = 'OK'
         score = d['score']
         grammarCount = d['grammarErrorCount']
         spellingCount = d['spellingErrorCount']
         json_object = json.dumps(d)
         foo_instance = Answer(user_id=request.user.id,question_id = qid,Json = json_object,score = score,grammarErrors = grammarCount ,spellingErrors = spellingCount, starttime=starttime, endtime=endtime)
         foo_instance.save()
-       
+    
         return HttpResponse(json_object)
 
 @login_required(login_url="login")

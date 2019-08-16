@@ -17,11 +17,22 @@ var submitEssay = function (e) {
             'starttime':starttime
         },
         function (data) {
-            highlightErrors(data);
-            $('#id_answer').hide();
-            $('#submit_button').hide();
-            $('#wordcount').hide();
-            $('#loader').hide();
+            if (data['status']=='OK') {
+                highlightErrors(data);
+                $('#id_answer').hide();
+                $('#submit_button').hide();
+                $('#wordcount').hide();
+                $('#loader').hide();
+            } else if (data['status']=='duplicate') {
+                alert(data['error']);
+                $('#id_answer').hide();
+                $('#submit_button').hide();
+                $('#wordcount').hide();
+                $('#loader').hide();
+            } else { //error
+                alert(data['error'] + " Please try submitting after some time");
+                $('#loader').hide();
+            }
         }, "json"
     )
 }
