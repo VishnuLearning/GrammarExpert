@@ -280,6 +280,9 @@ def fetch_results(request):
                 report = Report(essay, q)
                 readLanguageToolResponse()
                 d = report.reprJSON()
+            else:
+                logger.error(e)
+                return JsonResponse({'status':'error', 'error':'System Busy. Pleae try after some time'})
 
         d['status'] = 'OK'
         score = d['score']
