@@ -28,6 +28,7 @@ import pytz
 from django.utils import timezone
 import logging
 import subprocess
+from django.core.mail import send_mail
 
 logger = logging.getLogger(__name__)
 process = None
@@ -72,7 +73,7 @@ class EmailThread(threading.Thread):
         self.html_content = html_content
         threading.Thread.__init__(self)
 
-    def run (self):
+    def run(self):
         msg = EmailMessage(self.subject, self.html_content, to=[self.recipient])
         msg.content_subtype = "html"
         try:
@@ -88,8 +89,6 @@ def signup(request):
     colleges = [col[0] for col in c if col[0]]
     print(colleges)
     if request.method == 'POST':
-        user_form = UserForm(request.POST)
-        profile_form = ProfileForm(request.POST)
         user_form = UserForm(request.POST)
         profile_form = ProfileForm(request.POST)
         if user_form.is_valid() and profile_form.is_valid():
@@ -111,8 +110,8 @@ def signup(request):
             message = render_to_string('registration/acc_active_email.html', {
                 'user': user,
                 'domain': current_site.domain,
-                'uid':uid,
-                'token':tok,
+                'uid': uid,
+                'token': tok,
             })
             to_email = user_form.cleaned_data.get('email')
 
@@ -121,6 +120,7 @@ def signup(request):
             #             mail_subject, message, to=[to_email]
             # )
             # email.send()
+            # send_mail(mail_subject, message, 'grammarexpert@vishnu.edu.in', [to_email])
             return render(request, 'registration/message.html', {'message':'Please confirm your email address to complete the registration'})
     else:
         user_form = UserForm()

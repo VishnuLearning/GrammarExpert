@@ -11,14 +11,15 @@
                         <form method="post">
                             {% csrf_token %}
                             {% bootstrap_form form %}
-                            <input type="submit" name="commit" value="Login" tabindex="3" class="btn btn-primary btn-block" data-disable-with="Logging in…">
+                            <input type="submit" name="commit" value="Login" tabindex="3" class="btn btn-primary btn-block" data-disable-with="Logging in…"><br/>
+                            <a href="{% url 'password_reset' %}" class="card-link">Forgot Password</a>
                         </form>
                     </div>
                 </div>
                 <div class="card card-create-user mt-3">
                     <div class="card-body text-center">
                         New to Grammar Expert?
-                        <a href="{% url "signup" %}" class="card-link">Create account</a>
+                        <a href="{% url 'signup' %}" class="card-link">Create account</a>
                     </div>
                 </div>
             </div>

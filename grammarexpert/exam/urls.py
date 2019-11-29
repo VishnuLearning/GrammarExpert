@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.generic.base import TemplateView
+from django.contrib.auth.views import PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView
 from . import views
+from django.conf.urls import url
+from django.urls.base import reverse_lazy
 
 
 urlpatterns = [
@@ -25,4 +28,9 @@ urlpatterns = [
     path('canattempt/<str:code>',views.canattempt, name = 'canattempt'),
     path('deleteattempt/<int:attemptid>',views.deleteattempt, name = 'deleteattempt'),
     path('updatequestion/<int:pk>',views.EditQuestion.as_view(), name = 'updatequestion'),
+    path('reset-password/', PasswordResetView.as_view(template_name= 'registration/reset_password.html', success_url= 'done/', email_template_name= 'registration/reset_password_email.html'), name='password_reset'),
+    path('reset-password/done/', PasswordResetDoneView.as_view(template_name= 'registration/reset_password_done.html'), name='password_reset_done'), # name as "password_reset_done" because the default 'reset password' view is defined to redirect to view with that name 
+    # path('reset-password/confirm/<str:uidb64>/<str:token>/', PasswordResetConfirmView.as_view(template_name= 'registration/reset_password_confirm.html', success_url= 'complete/'), name='password_reset_confirm'),
+    url(r'^reset-password/confirm/(?P<uidb64>[0-9A-Za-z]+)-(?P<token>.+)/$', PasswordResetConfirmView.as_view(template_name= 'registration/reset_password_confirm.html', success_url= reverse_lazy('password_reset_complete')), name='password_reset_confirm'),
+    path('reset-password/complete/', PasswordResetCompleteView.as_view(template_name= 'registration/reset_password_complete.html'), name='password_reset_complete')
 ]
